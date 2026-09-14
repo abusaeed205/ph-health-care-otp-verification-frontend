@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { loginSchema } from "@/validation";
-import { useGoogleAuth, useLogin } from "@/hooks";
+import {useLogin } from "@/hooks";
 
 import { Button } from "../ui/button";
 import {
@@ -19,16 +19,16 @@ import {
 import { Input } from "../ui/input";
 import { toast } from "../ui/toast";
 import { Spinner } from "../ui/spinner";
-import { GoogleLogin } from "@react-oauth/google";
+
+import GoogleLoginComponent from "../modules/google-login/GoogleLogin";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const {mutate: login,isPending: loginPending,} = useLogin();
+  const {mutate: login,isPending: loginPending,} = useLogin(); //api hook
 
   const router = useRouter();
-  const {mutate:googleLogin}=useGoogleAuth()
-
   
+
   const form = useForm({
     defaultValues: {
       email: "saeedalom2021@gmail.com",
@@ -79,47 +79,48 @@ export default function LoginForm() {
     },
   });
 
+  // এই Google login Function টা আমরা আলাদা Components এ রেখে ব্যবহার করছি 
   // Google Login এর Function  
-  const handleGoogleSuccess=(credentialResponse:{credential?:string})=>{
-    const idToken= credentialResponse.credential
-    if(!idToken){
-      toast.add({
-      title:"Google Auth Failed",
-      description:"Something went wron.please try again",
-      type:"error"
-    })
-    return 
-    }
+  // const handleGoogleSuccess=(credentialResponse:{credential?:string})=>{
+  //   const idToken= credentialResponse.credential
+  //   if(!idToken){
+  //     toast.add({
+  //     title:"Google Auth Failed",
+  //     description:"Something went wron.please try again",
+  //     type:"error"
+  //   })
+  //   return 
+  //   }
 
-    googleLogin({idToken},{
-      onSuccess:()=>{
-         toast.add({
-          title:"logged in Successfully",
-          description:"Welcome Back",
-          type:"success"
-        })
+  //   googleLogin({idToken},{
+  //     onSuccess:()=>{
+  //        toast.add({
+  //         title:"logged in Successfully",
+  //         description:"Welcome Back",
+  //         type:"success"
+  //       })
 
-        router.push("/");
+  //       router.push("/");
 
-      },
-      onError:(err)=>{
-        toast.add({
-          title:"Google Auth Failed",
-          description:err.message,
-          type:"error"
-        })
-      }
-    })
+  //     },
+  //     onError:(err)=>{
+  //       toast.add({
+  //         title:"Google Auth Failed",
+  //         description:err.message,
+  //         type:"error"
+  //       })
+  //     }
+  //   })
 
-  }
+  // }
 
-  const handleGoogleError=()=>{
-    toast.add({
-      title:"Google Auth Failed",
-      description:"Something went wron.please try again",
-      type:"error"
-    })
-  }
+  // const handleGoogleError=()=>{
+  //   toast.add({
+  //     title:"Google Auth Failed",
+  //     description:"Something went wron.please try again",
+  //     type:"error"
+  //   })
+  // }
 
 
 
@@ -268,15 +269,9 @@ export default function LoginForm() {
         </FieldGroup>
       </form>
       <FieldSeparator>Or</FieldSeparator>
-      {/* (google login) react-oauth/google npm প্যাকেজ থেকে আসতেছে   */}
-      <GoogleLogin 
-      // এখানে কালার যুক্ত করা যায় theme এ  
-      theme="filled_blue"
-      shape="pill"
-      text="continue_with"
-      onSuccess={handleGoogleSuccess} 
-      onError={handleGoogleError}>
-      </GoogleLogin>
+       {/* Gogle login funcetion compontents  */}
+      <GoogleLoginComponent></GoogleLoginComponent>
+      
     </div>
   );
 }

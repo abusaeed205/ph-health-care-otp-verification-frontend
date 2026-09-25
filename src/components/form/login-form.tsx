@@ -1,4 +1,3 @@
-
 "use client";
 import { useForm } from "@tanstack/react-form";
 import { Eye, EyeClosed } from "lucide-react";
@@ -6,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { loginSchema } from "@/validation";
-import {useLogin } from "@/hooks";
+import { useLogin } from "@/hooks";
 
 import { Button } from "../ui/button";
 import {
@@ -21,18 +20,18 @@ import { toast } from "../ui/toast";
 import { Spinner } from "../ui/spinner";
 
 import GoogleLoginComponent from "../modules/google-login/GoogleLogin";
+import Link from "next/link";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const {mutate: login,isPending: loginPending,} = useLogin(); //api hook
+  const { mutate: login, isPending: loginPending } = useLogin(); //api hook
 
   const router = useRouter();
-  
 
   const form = useForm({
     defaultValues: {
-      email: "saeedalom2021@gmail.com",
-      password: "AbuSaeed123!",
+      email: "",
+      password: "",
     },
 
     validators: {
@@ -65,22 +64,20 @@ export default function LoginForm() {
         // =========================
         // Login Error
         // =========================
-        onError: (err) => {
-          console.error("Login failed:", err);
-
-          toast.add({
-            title: "Authorization Failure",
-            description:
-              err.message || "Invalid email or password.",
-            type: "error",
-          });
-        },
+        // onError: (err) => {
+        //   toast.add({
+        //     title: "Authorization Failure",
+        //     description:
+        //       "Invalid email or password.",
+        //     type: "error",
+        //   });
+        // },
       });
     },
   });
 
-  // এই Google login Function টা আমরা আলাদা Components এ রেখে ব্যবহার করছি 
-  // Google Login এর Function  
+  // এই Google login Function টা আমরা আলাদা Components এ রেখে ব্যবহার করছি
+  // Google Login এর Function
   // const handleGoogleSuccess=(credentialResponse:{credential?:string})=>{
   //   const idToken= credentialResponse.credential
   //   if(!idToken){
@@ -89,7 +86,7 @@ export default function LoginForm() {
   //     description:"Something went wron.please try again",
   //     type:"error"
   //   })
-  //   return 
+  //   return
   //   }
 
   //   googleLogin({idToken},{
@@ -122,8 +119,6 @@ export default function LoginForm() {
   //   })
   // }
 
-
-
   return (
     <div className="flex flex-col gap-5">
       {/* Header */}
@@ -151,14 +146,11 @@ export default function LoginForm() {
           <form.Field name="email">
             {(field) => {
               const isInvalid =
-                field.state.meta.isTouched &&
-                !field.state.meta.isValid;
+                field.state.meta.isTouched && !field.state.meta.isValid;
 
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Email
-                  </FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
 
                   <Input
                     id={field.name}
@@ -166,19 +158,13 @@ export default function LoginForm() {
                     type="email"
                     placeholder="Enter your email"
                     value={field.state.value}
-                    onChange={(e) =>
-                      field.handleChange(e.target.value)
-                    }
+                    onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
                     autoComplete="email"
                     aria-invalid={isInvalid}
                   />
 
-                  {isInvalid && (
-                    <FieldError
-                      errors={field.state.meta.errors}
-                    />
-                  )}
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
@@ -190,29 +176,20 @@ export default function LoginForm() {
           <form.Field name="password">
             {(field) => {
               const isInvalid =
-                field.state.meta.isTouched &&
-                !field.state.meta.isValid;
+                field.state.meta.isTouched && !field.state.meta.isValid;
 
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Password
-                  </FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
 
                   <div className="relative">
                     <Input
                       id={field.name}
                       name={field.name}
-                      type={
-                        showPassword
-                          ? "text"
-                          : "password"
-                      }
+                      type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       value={field.state.value}
-                      onChange={(e) =>
-                        field.handleChange(e.target.value)
-                      }
+                      onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
                       autoComplete="current-password"
                       aria-invalid={isInvalid}
@@ -222,14 +199,10 @@ export default function LoginForm() {
                     <button
                       type="button"
                       aria-label={
-                        showPassword
-                          ? "Hide password"
-                          : "Show password"
+                        showPassword ? "Hide password" : "Show password"
                       }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      onClick={() =>
-                        setShowPassword((prev) => !prev)
-                      }
+                      onClick={() => setShowPassword((prev) => !prev)}
                     >
                       {showPassword ? (
                         <EyeClosed className="size-4" />
@@ -239,11 +212,7 @@ export default function LoginForm() {
                     </button>
                   </div>
 
-                  {isInvalid && (
-                    <FieldError
-                      errors={field.state.meta.errors}
-                    />
-                  )}
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
@@ -252,11 +221,7 @@ export default function LoginForm() {
           {/* =========================
               Submit Button
           ========================= */}
-          <Button
-            type="submit"
-            disabled={loginPending}
-            className="w-full"
-          >
+          <Button type="submit" disabled={loginPending} className="w-full">
             {loginPending ? (
               <>
                 <Spinner />
@@ -269,10 +234,21 @@ export default function LoginForm() {
         </FieldGroup>
       </form>
       <FieldSeparator>Or</FieldSeparator>
-       {/* Gogle login funcetion compontents  */}
+      {/* Gogle login funcetion compontents  */}
       <GoogleLoginComponent></GoogleLoginComponent>
+        <div className="text-center text-sm text-muted-foreground">
+        If you don't have an account!{" "}
+        <Link
+          href="/register"
+          className="font-medium underline underline-offset-4 hover:text-primary"
+        >
+          Register
+        </Link>
+      </div>
       
     </div>
   );
 }
+
+
 

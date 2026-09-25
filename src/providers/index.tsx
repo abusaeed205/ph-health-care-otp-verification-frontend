@@ -1,16 +1,16 @@
-"use client"
+"use client";
 import type { ReactNode } from "react";
 import QueryProvider from "./query.provider";
 import GoogleOAuthProvider from "./google-auth.provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
-
-// এই providerটা layout এ ব্যবহার করা হচ্ছে 
-export default function Provider({children}:{children:ReactNode}) {
+// এই providerটা মেইন layout এ ব্যবহার করা হচ্ছে
+export default function Provider({ children }: { children: ReactNode }) {
   return (
     <GoogleOAuthProvider>
       <QueryProvider>
-      {children}
-    </QueryProvider>
+        <TooltipProvider>{children}</TooltipProvider>
+      </QueryProvider>
     </GoogleOAuthProvider>
-  )
+  );
 }

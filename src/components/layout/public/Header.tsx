@@ -2,21 +2,32 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { useGetMe, useLogOut } from "@/hooks";
+import { UserRole } from "@/types/user.type";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 
 export default function Header() {
   const routes = [
     { name: "Home", url: "/" },
-    { name: "About us", url: "/about-us" },
-    { name: "Register", url: "/register" },
+    { name: "Doctor", url: "/doctors" },
   ];
+
+  // Role অনুযায়ী ড্যাশবোর্ড দেখাবে 
+  const dashboardRoute:Record<UserRole,string>={
+    SUPER_ADMIN:"/admin",
+    ADMIN:"/admin",
+    DOCTOR:"/doctor",
+    PATIENT:"/dashboard"
+  }
    
   // api fetch করা হচ্ছে Hook থেকে  
   const {data,isLoading}=useGetMe()
   const {mutate:logout}=useLogOut()
 
   const queryClient=useQueryClient()
+
+  // data api থেকে আসতেছে  
+  const role:UserRole =!!data?.data&& data?.data.role
 
 
   const handleLogout=()=>{
@@ -52,6 +63,7 @@ export default function Header() {
               {route.name}
             </Link>
           ))}
+          {role && <Link href={dashboardRoute[role]}>Dashboard</Link>}
         </nav>
         <div>
          {!isLoading && !data &&(

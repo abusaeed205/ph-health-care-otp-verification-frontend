@@ -15,11 +15,17 @@ import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 import { useEffect, useState } from "react";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { toast } from "../ui/toast";
-import { useVerifyAccount } from "@/hooks";
+import { useVerifyAccount, useVerifyDoctorAccount } from "@/hooks";
+
+// একটাই ফর্ম দিয়ে ডাক্তার এবং রোগী দুজন কেই ভেরিফাই করতে পারবো
 
 const RESEND_COOLDOWN = 120; // OTP রিসেট টাইম
 
-export default function VerifyAccountForm() {
+export default function VerifyAccountForm({
+  mode = "patient",
+}: {
+  mode: "doctor" | "patient";
+}) {
   const searchParams = useSearchParams(); // এটা দিয়ে ডায়নামিক রাউটের email টা রিছিব করবো 
 //  console.log(searchParams.get("emial"))
   const router = useRouter();
@@ -30,7 +36,11 @@ export default function VerifyAccountForm() {
 
 //  hook থেকে আসতেছে api এটার সহায্যে কল করা হচ্ছে 
 // এখান -> Hook ->api ->lib/apiClient তার পর শেষে ডাটাবেইজে যাচ্ছে
-  const { mutate: verify, isPending: verifyPending } = useVerifyAccount();
+  const { mutate: verifypatient, isPending: verifyPending } = useVerifyAccount();
+  const {mutate:verifyDoctor}=useVerifyDoctorAccount()
+
+  // mode Doctor হলে Doctor verify করো  অন্যথায় patent কে ভেরিফাই করো
+ const verify = mode === "doctor" ? verifyDoctor : verifypatient;
 
   const email = searchParams.get("email") || "";
 
@@ -78,12 +88,24 @@ export default function VerifyAccountForm() {
           });
         }
 
-        toast.add({
+        if(mode === "doctor"){
+            toast.add({
           title: "Verification Successful",
-          description: "Welcome onboard",
+          description: "An admin Will approve your account.This may take time.please check your email in few days",
           type: "success",
         });
         router.push("/");
+        return
+        }
+
+        
+          toast.add({
+          title: "Verification Successful",
+          description: "An admin Will approve your account.This may take time.please check your email in few days",
+          type: "success",
+        });
+        router.push("/");
+        return 
       },
       onError: (err) => {
         toast.add({
@@ -165,4 +187,5 @@ export default function VerifyAccountForm() {
       </CardFooter>
     </Card>
   );
+
 }

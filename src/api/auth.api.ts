@@ -18,7 +18,7 @@ export function userRegistation(payload:registrationPayload) {
 }
 
 export function userLogOut() {
-  // backend postman থেকে পাই  /auth/login
+  // backend postman থেকে পাই  /auth/login-------++++++]]]][]
   return apiClient("/auth/logout", { method: "POST"});
 }
 

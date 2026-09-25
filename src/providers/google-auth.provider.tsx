@@ -20,6 +20,8 @@ export default function GoogleOAuthProvider({children}:{children:ReactNode}) {
 }
 
 
-//GoogleOAuthProvider এটা Providers এর index.tsx এ বসাবো  
-// তার পর 
+//GoogleOAuthProvider এটা Providers এর index.tsx এ বসাবো  ।
+// সেই index আবার মেইন Layout এর সাথে ‍য ‍ুক্ত
+
+
 // এর পর এখান থেকে Api তে ফাংশন বানবো  

@@ -20,7 +20,7 @@ export default function VerifyAccountPage() {
           <div className="w-full max-w-xs">
             {/* এখানে Suspense দিয়ে ভেরিফাই form যুক্ত করে দিছে যাতে build করতে Error না আসে */}
             <Suspense fallback={<p>Loading...</p>}>
-              <VerifyAccountForm />
+              <VerifyAccountForm mode="patient" />
             </Suspense>
           </div>
         </div>

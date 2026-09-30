@@ -1,7 +1,10 @@
 import apiClient from "@/lib/apiclient";
-import { ApiResponse } from "@/types";
-import { BookAppointmentPayload, BookAppointmentResponse } from "@/types/appointment.type";
-
+import type { ApiResponse } from "@/types";
+import type {
+  Appointment,
+  BookAppointmentPayload,
+  BookAppointmentResponse,
+} from "@/types/appointment.type";
 
 export function bookAppointment(payload: BookAppointmentPayload) {
   return apiClient<ApiResponse<BookAppointmentResponse>>(
@@ -14,7 +17,7 @@ export function bookAppointment(payload: BookAppointmentPayload) {
 }
 
 export function getMyAppointments(params: { page?: number; limit?: number }) {
-  return apiClient("/appointment/my-appointments", {
+  return apiClient<ApiResponse<Appointment[]>>("/appointment/my-appointments", {
     params,
   });
 }

@@ -1,5 +1,8 @@
 "use client";
 
+import { format } from "date-fns";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,11 +18,6 @@ import { useGetMe, useGetTodayScheduleByDoctor } from "@/hooks";
 import { useBookAppointment } from "@/hooks/appointment.hook";
 import type { Schedule } from "@/types/schedule.type";
 
-
-import { format } from "date-fns";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
 interface BookingConfirmation {
   schedule: Schedule;
   paymentUrl: string;
@@ -28,10 +26,13 @@ interface BookingConfirmation {
 export default function DoctorBooking({ doctorId }: { doctorId: string }) {
   const router = useRouter();
 
-
   const { data: me, isPending: mePending } = useGetMe(); //ইউজার লগইন করা আছে কিনা
-  const { data, isPending, error } = useGetTodayScheduleByDoctor({ doctorId });//ডাক্তারের আজকের schedule/slot fetch করে
-  const { mutate: book, isPending: bookingPending } = useBookAppointment(); //বুকিং API request চালানো হচ্ছে
+  const { data, isPending, error } = useGetTodayScheduleByDoctor({ doctorId }); //ডাক্তারের আজকের schedule/slot fetch করে
+  const {
+    mutate: book,
+    isPending: bookingPending,
+    error: bookingError,
+  } = useBookAppointment(); //বুকিং API request চালানো হচ্ছে
 
   // ৪) সফল বুকিংয়ের পর payment dialog/URL store করার state
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(
@@ -98,6 +99,12 @@ export default function DoctorBooking({ doctorId }: { doctorId: string }) {
   return (
     <>
       <div>
+        {bookingError && (
+          <p className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+            Booking failed. The selected slot may no longer be available. Please
+            choose another slot.
+          </p>
+        )}
         {schedules.map((schedule) => (
           <div
             key={schedule.id}

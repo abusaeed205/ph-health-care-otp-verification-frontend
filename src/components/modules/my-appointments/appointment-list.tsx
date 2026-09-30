@@ -1,59 +1,99 @@
-"use client"
-import { Button } from "@/components/ui/button";
-import { useGetMyAppointments } from "@/hooks/appointment.hook";
+"use client";
+
+import { format } from "date-fns";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-
-
+import { buttonVariants } from "@/components/ui/button";
+import { useGetMyAppointments } from "@/hooks/appointment.hook";
 
 export default function AppointmentList() {
   const params = useSearchParams();
-  // params এর মাধ্যমে doctor-booking থেকে bkash api url থেকে ‍status পাই
-  const status = params.get("status");
-  const { data } = useGetMyAppointments({ page: 1, limit: 100 });
+  const paymentStatus = params.get("status");
+  const { data, error, isPending } = useGetMyAppointments({
+    page: 1,
+    limit: 100,
+  });
   const appointments = data?.data || [];
 
-  if (status === "failue") {
-    return (
-      <div>
-        <div>
-          <h1>Payment Failed</h1>
-          <p>Please check your vendor</p>
-          <Link href="/dashboard/my-appointments">Go back to appointments</Link>
-        </div>
-      </div>
-    );
+  if (isPending) {
+    return <p>Loading appointments...</p>;
   }
 
-  if (status === "success") {
-    return (
-      <div>
-        <div>
-          <h1>Payment Successful</h1>
-          <p>Please be prepared to join the video call</p>
-          <Link href="/dashboard/my-appointments">Go back to appointments</Link>
-        </div>
-      </div>
-    );
-  }
-
-  if(appointments.length===0){
-    return <p>There is not appointment</p>
+  if (error) {
+    return <p>Could not load appointments. Please try again.</p>;
   }
 
   return (
-    <div>
-      {appointments.map(({ doctor, status }) => (
-        <div key={doctor.id} className="border rounded-md p-3">
-          <div className="w-full flex gap-3">
-            <span>Doctor.name:{doctor.name}</span>
-            <span>Doctor.name:{status}</span>
-            <div className="ml-auto">
-              <Button>Join</Button>
-            </div>
-          </div>
+    <div className="space-y-4">
+      {paymentStatus === "success" && (
+        <div className="rounded-md border border-green-200 bg-green-50 p-4">
+          <h1 className="font-semibold text-green-900">Payment successful</h1>
+          <p className="text-sm text-green-800">
+            Your appointment confirmation is shown below.
+          </p>
         </div>
-      ))}
+      )}
+
+      {(paymentStatus === "failure" ||
+        paymentStatus === "failue" ||
+        paymentStatus === "cancel") && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4">
+          <h1 className="font-semibold text-red-900">
+            {paymentStatus === "cancel"
+              ? "Payment cancelled"
+              : "Payment failed"}
+          </h1>
+          <p className="text-sm text-red-800">
+            No payment confirmation was received. Please try again.
+          </p>
+        </div>
+      )}
+
+      {appointments.length === 0 ? (
+        <p>There are no appointments.</p>
+      ) : (
+        appointments.map((appointment) => {
+          const doctor = appointment.doctor;
+          const schedule = appointment.schedule;
+
+          return (
+            <div key={appointment.id} className="rounded-md border p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="min-w-48">
+                  <p className="font-medium">{doctor?.name ?? "Doctor"}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {doctor?.specialization ?? "Healthcare specialist"}
+                  </p>
+                </div>
+                <span className="rounded-full bg-muted px-3 py-1 text-sm">
+                  {appointment.status}
+                </span>
+                {appointment.payment && (
+                  <span className="rounded-full bg-muted px-3 py-1 text-sm">
+                    Payment: {appointment.payment.status}
+                  </span>
+                )}
+                {appointment.status === "CONFIRMED" &&
+                  schedule?.meetingLink && (
+                    <Link
+                      className={buttonVariants({ className: "ml-auto" })}
+                      href={schedule.meetingLink}
+                    >
+                      Join
+                    </Link>
+                  )}
+              </div>
+              {schedule && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {format(new Date(schedule.startDateTime), "PPP p")}
+                  {appointment.joiningTime &&
+                    ` - Join at ${format(new Date(appointment.joiningTime), "p")}`}
+                </p>
+              )}
+            </div>
+          );
+        })
+      )}
     </div>
   );
 }
